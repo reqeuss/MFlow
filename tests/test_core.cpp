@@ -1,3 +1,4 @@
+#include "mflow/converter.hpp"
 #include "mflow/memory.hpp"
 #include "mflow/pipeline.hpp"
 #include "mflow/scheduler.hpp"
@@ -34,6 +35,11 @@ int main() {
         const auto info = mflow::system_info();
         assert(info.hardware_threads >= 1);
         assert(info.recommended_workers >= 1);
+    }
+    {
+        // The converter is optional at runtime; this test only verifies its API is callable.
+        const bool available = mflow::MediaConverter::backend_available();
+        (void)available;
     }
     std::cout << "All MFlow tests passed.\n";
     return 0;
