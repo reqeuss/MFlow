@@ -4,11 +4,13 @@ Efficient open-source multimedia processing engine.
 
 > Move less data. Do less work. Measure everything.
 
-MFlow is a local-first C++20 multimedia engine focused on efficient execution: avoiding unnecessary downloads, decoding, encoding, conversions, memory copies and CPU/GPU transfers.
+MFlow is a local-first C++20 multimedia engine focused on efficient execution: avoiding unnecessary decoding, encoding, conversions, memory copies and CPU/GPU transfers.
 
 ## Status
 
-**v0.1 — Foundation.** This release provides the execution architecture, not a replacement for FFmpeg yet.
+**v0.2 — First conversion pipeline.**
+
+This release introduces the first real media conversion command through an external media backend while keeping the conversion interface inside MFlow. The core remains modular so future native backends, zero-copy paths and hardware acceleration can be added without changing the CLI contract.
 
 Included:
 - C++20 core
@@ -17,7 +19,8 @@ Included:
 - parallel scheduler
 - system detection
 - lightweight media probing
-- CLI
+- media conversion API
+- CLI conversion command
 - tests and benchmarks
 - cross-platform CI
 
@@ -30,6 +33,8 @@ cmake -S . -B build
 cmake --build build --config Release
 ctest --test-dir build -C Release --output-on-failure
 ```
+
+With Ninja, executables are normally placed directly in `build/`.
 
 ### Linux/macOS
 
@@ -45,9 +50,44 @@ ctest --test-dir build --output-on-failure
 mflow version
 mflow info
 mflow probe <file>
+mflow convert <input> <output> [options]
 mflow pipeline-demo
 mflow benchmark
 ```
+
+### Convert a video
+
+MFlow v0.2 requires a media conversion backend available on `PATH`.
+
+```powershell
+mflow convert input.mp4 output.mp4
+```
+
+Select codecs:
+
+```powershell
+mflow convert input.mp4 output.mp4 --video-codec libx264 --audio-codec aac
+```
+
+Resize while converting:
+
+```powershell
+mflow convert input.mp4 output.mp4 --scale 1280:720
+```
+
+Prevent overwriting an existing output:
+
+```powershell
+mflow convert input.mp4 output.mp4 --no-overwrite
+```
+
+Check whether the backend is detected:
+
+```powershell
+mflow info
+```
+
+The output includes `Conversion backend: available` when a compatible backend is found.
 
 ## Architecture
 
@@ -59,11 +99,17 @@ INPUT -> DEMUX -> STREAM PLANNER -> DECODE -> FILTER -> ENCODE -> MUX -> OUTPUT
                                              SCHEDULER
 ```
 
+The v0.2 conversion layer is intentionally isolated from the core execution engine. This lets MFlow evolve its scheduling, memory and stream-planning logic independently from individual media backends.
+
 The long-term design targets zero-copy paths, buffer lifetime planning, pipeline fusion, asynchronous I/O, hardware acceleration and stream-aware processing.
 
-## Example
+## Efficiency Principle
 
-If a workflow only needs audio, MFlow should eventually avoid downloading and decoding an unnecessary video stream. If a GPU can decode, filter and encode without returning frames to system RAM, MFlow should preserve that path.
+MFlow is designed around a simple rule:
+
+> Don't process what you don't need.
+
+For example, a future audio-only workflow should be able to avoid unnecessary video processing. Likewise, a hardware pipeline should preserve frames on the accelerator instead of repeatedly copying them through system memory.
 
 ## Roadmap
 
