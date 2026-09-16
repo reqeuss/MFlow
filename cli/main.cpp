@@ -1,3 +1,4 @@
+#include "mflow/converter.hpp"
 #include "mflow/media.hpp"
 #include "mflow/pipeline.hpp"
 #include "mflow/scheduler.hpp"
@@ -9,30 +10,119 @@
 #include <string>
 #include <vector>
 
-namespace { void usage() { std::cout << "MFlow " << MFLOW_VERSION_STRING << "\n\nUsage:\n  mflow version\n  mflow info\n  mflow probe <file>\n  mflow pipeline-demo\n  mflow benchmark\n"; } }
+namespace {
+void usage() {
+    std::cout << "MFlow " << MFLOW_VERSION_STRING << "\n\nUsage:\n"
+              << "  mflow version\n"
+              << "  mflow info\n"
+              << "  mflow probe <file>\n"
+              << "  mflow convert <input> <output> [options]\n"
+              << "  mflow pipeline-demo\n"
+              << "  mflow benchmark\n\n"
+              << "Convert options:\n"
+              << "  --video-codec <codec>  Select video codec\n"
+              << "  --audio-codec <codec>  Select audio codec\n"
+              << "  --scale <WxH>          Resize video\n"
+              << "  --no-overwrite         Refuse to replace output\n";
+}
+
+bool take_value(int& index, int argc, char** argv, std::string& value) {
+    if (index + 1 >= argc) return false;
+    value = argv[++index];
+    return true;
+}
+} // namespace
 
 int main(int argc, char** argv) {
-    if (argc < 2) { usage(); return 0; }
+    if (argc < 2) {
+        usage();
+        return 0;
+    }
+
     const std::string command = argv[1];
-    if (command == "version") { std::cout << "MFlow " << MFLOW_VERSION_STRING << '\n'; return 0; }
+
+    if (command == "version") {
+        std::cout << "MFlow " << MFLOW_VERSION_STRING << '\n';
+        return 0;
+    }
+
     if (command == "info") {
         const auto info = mflow::system_info();
         std::cout << "MFlow " << MFLOW_VERSION_STRING << '\n'
                   << "Platform: " << info.platform << '\n'
                   << "Architecture: " << info.architecture << '\n'
                   << "Hardware threads: " << info.hardware_threads << '\n'
-                  << "Recommended workers: " << info.recommended_workers << '\n';
+                  << "Recommended workers: " << info.recommended_workers << '\n'
+                  << "Conversion backend: "
+                  << (mflow::MediaConverter::backend_available() ? "available" : "not found") << '\n';
         return 0;
     }
+
     if (command == "probe") {
-        if (argc < 3) { std::cerr << "Missing file.\n"; return 2; }
+        if (argc < 3) {
+            std::cerr << "Missing file.\n";
+            return 2;
+        }
         const auto result = mflow::MediaProbe::probe(argv[2]);
-        if (!result) { std::cerr << "Unable to read file.\n"; return 1; }
+        if (!result) {
+            std::cerr << "Unable to read file.\n";
+            return 1;
+        }
         std::cout << "Type: " << mflow::MediaProbe::kind_name(result->kind) << '\n'
                   << "Description: " << result->description << '\n'
                   << "Size: " << result->size_bytes << " bytes\n";
         return 0;
     }
+
+    if (command == "convert") {
+        if (argc < 4) {
+            std::cerr << "Usage: mflow convert <input> <output> [options]\n";
+            return 2;
+        }
+
+        mflow::ConvertOptions options;
+        options.input = argv[2];
+        options.output = argv[3];
+
+        for (int i = 4; i < argc; ++i) {
+            const std::string arg = argv[i];
+            if (arg == "--video-codec") {
+                if (!take_value(i, argc, argv, options.video_codec)) {
+                    std::cerr << "Missing value for --video-codec.\n";
+                    return 2;
+                }
+            } else if (arg == "--audio-codec") {
+                if (!take_value(i, argc, argv, options.audio_codec)) {
+                    std::cerr << "Missing value for --audio-codec.\n";
+                    return 2;
+                }
+            } else if (arg == "--scale") {
+                if (!take_value(i, argc, argv, options.scale)) {
+                    std::cerr << "Missing value for --scale.\n";
+                    return 2;
+                }
+            } else if (arg == "--no-overwrite") {
+                options.overwrite = false;
+            } else {
+                std::cerr << "Unknown option: " << arg << '\n';
+                return 2;
+            }
+        }
+
+        std::cout << "MFlow conversion\n"
+                  << "Input:  " << options.input.string() << '\n'
+                  << "Output: " << options.output.string() << '\n';
+
+        const auto result = mflow::MediaConverter::convert(options);
+        if (!result.success) {
+            std::cerr << "Error: " << result.message << '\n';
+            return result.exit_code == -1 ? 1 : result.exit_code;
+        }
+
+        std::cout << result.message << '\n';
+        return 0;
+    }
+
     if (command == "pipeline-demo") {
         mflow::Pipeline pipeline;
         pipeline.add_stage("source", [](mflow::Packet&) {});
@@ -45,6 +135,7 @@ int main(int argc, char** argv) {
         std::cout << "Processed packets: " << packets.size() << '\n';
         return 0;
     }
+
     if (command == "benchmark") {
         constexpr std::size_t task_count = 200000;
         mflow::Scheduler scheduler;
@@ -62,6 +153,7 @@ int main(int argc, char** argv) {
                   << " ms\nChecksum: " << checksum << '\n';
         return 0;
     }
+
     usage();
     return 1;
 }
