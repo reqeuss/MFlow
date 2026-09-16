@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(MFlow VERSION 0.1.0 DESCRIPTION "Efficient open-source multimedia processing engine" LANGUAGES CXX)
+project(MFlow VERSION 0.2.0 DESCRIPTION "Efficient open-source multimedia processing engine" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -16,6 +16,7 @@ add_library(mflow_core
     core/src/pipeline.cpp
     core/src/scheduler.cpp
     core/src/system.cpp
+    core/src/converter.cpp
 )
 
 target_include_directories(mflow_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/core/include)
