@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <filesystem>
 #include <string>
 
@@ -23,11 +24,11 @@ struct ConvertResult {
 
 class MediaConverter {
 public:
-    // Returns true when the built-in native media engine is available.
+    // The media engine is built into MFlow. No external backend is required.
     static bool backend_available();
 
-    // v0.3 supports native stream/file copying only. Codec and scaling
-    // requests are rejected until their native implementations land.
+    // v0.3 supports native stream/file copying. Codec and scaling requests
+    // are rejected until their native implementations are available.
     static ConvertResult convert(const ConvertOptions& options);
 };
 
