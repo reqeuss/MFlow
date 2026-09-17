@@ -2,58 +2,58 @@
 
 > **Move less data. Do less work. Measure everything.**
 
-MFlow est un moteur multimédia open source, local et natif écrit en C++20.
+MFlow is an open-source, local and native multimedia engine written in C++20.
 
-L'objectif est de construire une alternative indépendante aux outils multimédias classiques, avec une architecture capable de décider quelles opérations sont réellement nécessaires avant de traiter les données.
+The project aims to build an independent multimedia engine with its own architecture, without requiring FFmpeg or another external multimedia executable.
 
-## 🌍 Langues
+## 🌍 Languages
 
-- 🇫🇷 Français — ce README
-- 🇬🇧 [English](README.en.md)
+- 🇬🇧 **English — this README**
+- 🇫🇷 [Français](README.fr.md)
 - 🇪🇸 [Español](README.es.md)
 - 🇩🇪 [Deutsch](README.de.md)
 
 ## 🚀 v0.3.0
 
-MFlow 0.3.0 pose les premières bases du moteur multimédia natif.
+MFlow 0.3.0 establishes the first foundations of the native media engine.
 
-**MFlow n'a pas besoin d'un exécutable multimédia externe.** Le chemin natif actuel est intégré directement au projet.
+**MFlow does not require FFmpeg or any external multimedia executable.** The current media path is implemented directly inside the project.
 
-### Ce qui fonctionne
+### What works
 
-- Détection de plateforme et architecture
-- Analyse légère de fichiers média
-- Détection des familles MP4, Matroska/WebM, WAV, MP3 et Ogg
-- Pipeline d'exécution
-- Scheduler parallèle
-- Gestion de buffers
-- Copie native de fichiers/flux
-- CLI Windows et Linux
-- Tests et benchmarks
+- Platform and architecture detection
+- Lightweight media file probing
+- Detection of MP4, Matroska/WebM, WAV, MP3 and Ogg families
+- Native execution pipeline
+- Parallel scheduler
+- Buffer management
+- Native file/stream copying
+- Windows and Linux CLI
+- Tests and benchmarks
 
-### Ce qui n'est pas encore implémenté
+### What is not implemented yet
 
-La conversion codec complète n'est pas encore disponible. MFlow ne prétend donc pas encoder ou décoder nativement H.264, H.265, AV1, AAC, Opus, etc. dans cette version.
+Full codec conversion is not available yet. MFlow therefore does not claim native H.264, H.265, AV1, AAC, Opus, or similar encoding/decoding support in this release.
 
-Une demande de codec ou de redimensionnement non supportée est refusée explicitement au lieu d'être déléguée à un programme externe.
+Unsupported codec or scaling requests are explicitly rejected instead of being delegated to an external program.
 
-## 🧠 Philosophie
+## 🧠 Philosophy
 
-MFlow est conçu autour d'une règle simple :
+MFlow is built around one simple rule:
 
-> **Ne traite pas ce dont tu n'as pas besoin.**
+> **Do not process what you do not need.**
 
-À terme, le planner pourra déterminer si une opération nécessite :
+Over time, the planner will determine whether an operation actually requires:
 
-- un décodage ;
-- un encodage ;
-- une conversion de format ;
-- une copie directe de flux ;
-- une allocation mémoire supplémentaire ;
-- un transfert CPU/GPU ;
-- ou aucune de ces opérations.
+- decoding;
+- encoding;
+- format conversion;
+- direct stream copying;
+- additional memory allocation;
+- CPU/GPU transfers;
+- or none of these operations.
 
-Architecture visée :
+Target architecture:
 
 ```text
 INPUT
@@ -69,7 +69,7 @@ WORK GRAPH
                                        OUTPUT
 ```
 
-## 📦 Arborescence
+## 📦 Project structure
 
 ```text
 MFlow/
@@ -83,18 +83,18 @@ MFlow/
 ├── docs/
 ├── CMakeLists.txt
 ├── README.md
-├── README.en.md
+├── README.fr.md
 ├── README.es.md
 ├── README.de.md
 ├── CHANGELOG.md
 └── LICENSE
 ```
 
-## 🔨 Compilation
+## 🔨 Build
 
 ### Windows
 
-Pré-requis : CMake 3.20+, un compilateur C++20 compatible et Git.
+Requirements: CMake 3.20+, a C++20-compatible compiler and Git.
 
 ```powershell
 cmake -S . -B build
@@ -102,7 +102,7 @@ cmake --build build --config Release
 ctest --test-dir build -C Release --output-on-failure
 ```
 
-Avec Ninja, les exécutables sont généralement directement dans `build/`.
+With Ninja, executables are normally placed directly in `build/`.
 
 ```powershell
 .\build\mflow.exe version
@@ -111,7 +111,7 @@ Avec Ninja, les exécutables sont généralement directement dans `build/`.
 
 ### Linux
 
-Pré-requis : CMake 3.20+, un compilateur C++20 et Git.
+Requirements: CMake 3.20+, a C++20-compatible compiler and Git.
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -119,7 +119,7 @@ cmake --build build -j
 ctest --test-dir build --output-on-failure
 ```
 
-Puis :
+Then:
 
 ```bash
 ./build/mflow version
@@ -137,31 +137,31 @@ mflow pipeline-demo
 mflow benchmark
 ```
 
-### Informations système
+### System information
 
 ```text
 mflow info
 ```
 
-Affiche notamment la plateforme, l'architecture, le nombre de threads et le statut du moteur média natif.
+Displays the platform, architecture, hardware thread count and native media engine status.
 
-### Analyser un fichier
+### Probe a file
 
 ```text
 mflow probe input.mp4
 ```
 
-MFlow inspecte actuellement les signatures de conteneurs/fichiers connues sans lancer de programme externe.
+MFlow currently inspects known container/file signatures without launching an external program.
 
-### Copie native
+### Native copy
 
 ```text
 mflow convert input.mp4 backup.mp4
 ```
 
-Dans v0.3.0, cette commande utilise le chemin natif de copie. Elle ne réalise pas encore de transcodage codec.
+In v0.3.0, this command uses MFlow's native copy path. It does not perform codec transcoding yet.
 
-Pour empêcher l'écrasement :
+To prevent overwriting an existing file:
 
 ```text
 mflow convert input.mp4 backup.mp4 --no-overwrite
@@ -169,25 +169,25 @@ mflow convert input.mp4 backup.mp4 --no-overwrite
 
 ## ⚡ Performance
 
-MFlow vise une réduction du travail inutile plutôt qu'une simple augmentation du nombre de threads.
+MFlow focuses on reducing unnecessary work rather than simply increasing thread count.
 
-Les futurs benchmarks devront préciser :
+Future media benchmarks should document:
 
-- version de MFlow ;
-- système d'exploitation ;
-- CPU ;
-- GPU ;
-- RAM ;
-- compilateur ;
-- fichier d'entrée ;
-- format de sortie ;
-- paramètres de traitement.
+- MFlow version;
+- operating system;
+- CPU;
+- GPU;
+- RAM;
+- compiler;
+- input media;
+- output format;
+- processing parameters.
 
-Aucune comparaison de performances sérieuse ne doit être publiée sans mesures reproductibles.
+No serious performance comparison should be published without reproducible measurements.
 
-## 🧩 Architecture native
+## 🧩 Native architecture
 
-Les composants sont séparés pour permettre une évolution progressive :
+Components are separated so the engine can evolve incrementally:
 
 ```text
 Media Probe
@@ -203,46 +203,46 @@ Decoder / Filter / Encoder
 Muxer
 ```
 
-La prochaine étape consiste à développer de vrais modèles `Packet`, `Stream` et `Frame`, puis les parseurs/demuxers/muxers natifs.
+The next development steps are real `Packet`, `Stream` and `Frame` models, followed by native parsers, demuxers and muxers.
 
 ## 🗺️ Roadmap
 
 ### v0.3.x
 
-- stabilité ;
-- tests supplémentaires ;
-- modèle Packet ;
-- modèle Stream ;
-- timestamps ;
-- amélioration du probe ;
-- benchmarks média réels.
+- stability;
+- additional tests;
+- Packet model;
+- Stream model;
+- timestamps;
+- improved probing;
+- real media benchmarks.
 
 ### v0.4.x
 
-- parseur MP4 natif ;
-- demuxer/muxer MP4 ;
-- métadonnées ;
+- native MP4 parser;
+- MP4 demuxer/muxer;
+- metadata;
 - audio/video stream model.
 
 ### v0.5.x
 
-- frames ;
-- formats pixel ;
-- formats audio ;
-- premières implémentations codec natives.
+- frames;
+- pixel formats;
+- audio formats;
+- first native codec implementations.
 
-### Plus tard
+### Later
 
-- H.264 / H.265 / AV1 ;
-- AAC / Opus ;
-- MKV/WebM ;
-- zero-copy ;
-- GPU ;
-- pipeline fusion ;
-- I/O asynchrone ;
-- accélération matérielle.
+- H.264 / H.265 / AV1;
+- AAC / Opus;
+- MKV/WebM;
+- zero-copy;
+- GPU processing;
+- pipeline fusion;
+- asynchronous I/O;
+- hardware acceleration.
 
-Les versions intermédiaires (`v0.3.1`, `v0.3.2`, etc.) serviront à intégrer progressivement ces fonctionnalités sans casser la base stable.
+Intermediate versions (`v0.3.1`, `v0.3.2`, etc.) will progressively add these capabilities while keeping the foundation stable.
 
 ## 🧪 Tests
 
@@ -250,19 +250,19 @@ Les versions intermédiaires (`v0.3.1`, `v0.3.2`, etc.) serviront à intégrer p
 ctest --test-dir build --output-on-failure
 ```
 
-Le projet doit rester compilable et testable sur Windows et Linux.
+The project is intended to remain buildable and testable on Windows and Linux.
 
-## 🤝 Contribution
+## 🤝 Contributing
 
-Les contributions sont les bienvenues. Pour une modification importante, privilégiez une architecture modulaire, des tests et, lorsqu'il s'agit de performance, un benchmark reproductible.
+Contributions are welcome. For significant changes, prefer modular architecture, tests and reproducible benchmarks for performance-related work.
 
-## 🔐 Indépendance
+## 🔐 Independence
 
-MFlow est conçu pour fonctionner sans dépendre d'un exécutable multimédia externe. Les fonctionnalités non encore implémentées sont refusées explicitement plutôt que remplacées silencieusement par une dépendance externe.
+MFlow is designed to operate without an external multimedia executable. Features that are not implemented are explicitly rejected instead of silently falling back to an external dependency.
 
-## 📜 Licence
+## 📜 License
 
-MFlow est distribué sous licence MIT.
+MFlow is distributed under the MIT License.
 
 ---
 
