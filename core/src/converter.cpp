@@ -1,6 +1,7 @@
 #include "mflow/converter.hpp"
 
 #include <fstream>
+#include <vector>
 
 namespace mflow {
 
