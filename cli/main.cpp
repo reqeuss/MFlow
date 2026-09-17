@@ -19,11 +19,9 @@ void usage() {
               << "  mflow convert <input> <output> [options]\n"
               << "  mflow pipeline-demo\n"
               << "  mflow benchmark\n\n"
-              << "Convert options:\n"
-              << "  --video-codec <codec>  Select video codec\n"
-              << "  --audio-codec <codec>  Select audio codec\n"
-              << "  --scale <WxH>          Resize video\n"
-              << "  --no-overwrite         Refuse to replace output\n";
+              << "Native convert options:\n"
+              << "  --no-overwrite         Refuse to replace output\n\n"
+              << "Codec and scaling options are reserved for future native implementations.\n";
 }
 
 bool take_value(int& index, int argc, char** argv, std::string& value) {
@@ -53,8 +51,8 @@ int main(int argc, char** argv) {
                   << "Architecture: " << info.architecture << '\n'
                   << "Hardware threads: " << info.hardware_threads << '\n'
                   << "Recommended workers: " << info.recommended_workers << '\n'
-                  << "Conversion backend: "
-                  << (mflow::MediaConverter::backend_available() ? "available" : "not found") << '\n';
+                  << "Media engine: native\n"
+                  << "External media executables: none\n";
         return 0;
     }
 
@@ -76,7 +74,7 @@ int main(int argc, char** argv) {
 
     if (command == "convert") {
         if (argc < 4) {
-            std::cerr << "Usage: mflow convert <input> <output> [options]\n";
+            std::cerr << "Usage: mflow convert <input> <output> [--no-overwrite]\n";
             return 2;
         }
 
@@ -86,30 +84,21 @@ int main(int argc, char** argv) {
 
         for (int i = 4; i < argc; ++i) {
             const std::string arg = argv[i];
-            if (arg == "--video-codec") {
-                if (!take_value(i, argc, argv, options.video_codec)) {
-                    std::cerr << "Missing value for --video-codec.\n";
-                    return 2;
-                }
-            } else if (arg == "--audio-codec") {
-                if (!take_value(i, argc, argv, options.audio_codec)) {
-                    std::cerr << "Missing value for --audio-codec.\n";
-                    return 2;
-                }
-            } else if (arg == "--scale") {
-                if (!take_value(i, argc, argv, options.scale)) {
-                    std::cerr << "Missing value for --scale.\n";
-                    return 2;
-                }
-            } else if (arg == "--no-overwrite") {
+            if (arg == "--no-overwrite") {
                 options.overwrite = false;
+            } else if (arg == "--video-codec") {
+                if (!take_value(i, argc, argv, options.video_codec)) return 2;
+            } else if (arg == "--audio-codec") {
+                if (!take_value(i, argc, argv, options.audio_codec)) return 2;
+            } else if (arg == "--scale") {
+                if (!take_value(i, argc, argv, options.scale)) return 2;
             } else {
                 std::cerr << "Unknown option: " << arg << '\n';
                 return 2;
             }
         }
 
-        std::cout << "MFlow conversion\n"
+        std::cout << "MFlow native media operation\n"
                   << "Input:  " << options.input.string() << '\n'
                   << "Output: " << options.output.string() << '\n';
 
@@ -119,7 +108,8 @@ int main(int argc, char** argv) {
             return result.exit_code == -1 ? 1 : result.exit_code;
         }
 
-        std::cout << result.message << '\n';
+        std::cout << result.message << '\n'
+                  << "Bytes copied: " << result.bytes_copied << '\n';
         return 0;
     }
 
