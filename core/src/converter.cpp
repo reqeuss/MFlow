@@ -1,88 +1,77 @@
 #include "mflow/converter.hpp"
 
-#include <cstdlib>
-#include <sstream>
-#include <string>
-
-#ifdef _WIN32
-#include <windows.h>
-#endif
+#include <fstream>
 
 namespace mflow {
-namespace {
-
-std::string quote_argument(const std::filesystem::path& path) {
-    const std::string value = path.string();
-    std::string quoted = "\"";
-    for (const char ch : value) {
-        if (ch == '"') quoted += '\\';
-        quoted += ch;
-    }
-    quoted += "\"";
-    return quoted;
-}
-
-std::string quote_value(const std::string& value) {
-    std::string quoted = "\"";
-    for (const char ch : value) {
-        if (ch == '"') quoted += '\\';
-        quoted += ch;
-    }
-    quoted += "\"";
-    return quoted;
-}
-
-} // namespace
 
 bool MediaConverter::backend_available() {
-#ifdef _WIN32
-    return std::system("where ffmpeg >nul 2>nul") == 0;
-#else
-    return std::system("command -v ffmpeg >/dev/null 2>&1") == 0;
-#endif
+    // The media engine is part of MFlow itself. No external backend is used.
+    return true;
 }
 
 ConvertResult MediaConverter::convert(const ConvertOptions& options) {
     if (options.input.empty() || options.output.empty()) {
-        return {false, -1, "Input and output are required."};
+        return {false, 2, "Input and output are required.", 0};
     }
 
-    if (!std::filesystem::exists(options.input)) {
-        return {false, -1, "Input file does not exist: " + options.input.string()};
+    if (!std::filesystem::is_regular_file(options.input)) {
+        return {false, 1, "Input file does not exist or is not a regular file.", 0};
     }
 
-    if (!backend_available()) {
-        return {false, -1, "No media conversion backend found. Install ffmpeg and make it available on PATH."};
+    if (options.input == options.output) {
+        return {false, 2, "Input and output must be different files.", 0};
     }
 
-    std::ostringstream command;
-    command << "ffmpeg ";
-    command << (options.overwrite ? "-y " : "-n ");
-    command << "-hide_banner -loglevel error ";
-    command << "-i " << quote_argument(options.input) << ' ';
-
-    if (!options.video_codec.empty()) {
-        command << "-c:v " << quote_value(options.video_codec) << ' ';
-    }
-    if (!options.audio_codec.empty()) {
-        command << "-c:a " << quote_value(options.audio_codec) << ' ';
-    }
-    if (!options.scale.empty()) {
-        command << "-vf " << quote_value("scale=" + options.scale) << ' ';
+    if (!options.overwrite && std::filesystem::exists(options.output)) {
+        return {false, 1, "Output already exists and --no-overwrite was specified.", 0};
     }
 
-    command << quote_argument(options.output);
-
-    const int exit_code = std::system(command.str().c_str());
-    if (exit_code != 0) {
-        return {false, exit_code, "Conversion backend returned a non-zero exit code."};
+    if (!options.video_codec.empty() || !options.audio_codec.empty() || !options.scale.empty()) {
+        return {false, 3,
+                "The requested codec/scale operation is not implemented natively in v0.3.0. "
+                "MFlow never delegates media work to an external executable.", 0};
     }
 
-    if (!std::filesystem::exists(options.output)) {
-        return {false, exit_code, "Conversion reported success but the output file was not created."};
+    std::ifstream input(options.input, std::ios::binary);
+    if (!input) {
+        return {false, 1, "Unable to open input file.", 0};
     }
 
-    return {true, exit_code, "Conversion completed successfully."};
+    std::error_code ec;
+    const auto parent = options.output.parent_path();
+    if (!parent.empty()) {
+        std::filesystem::create_directories(parent, ec);
+        if (ec) {
+            return {false, 1, "Unable to create output directory.", 0};
+        }
+    }
+
+    std::ofstream output(options.output, std::ios::binary | std::ios::trunc);
+    if (!output) {
+        return {false, 1, "Unable to create output file.", 0};
+    }
+
+    constexpr std::size_t buffer_size = 1024 * 1024;
+    std::vector<char> buffer(buffer_size);
+    std::uintmax_t copied = 0;
+
+    while (input) {
+        input.read(buffer.data(), static_cast<std::streamsize>(buffer.size()));
+        const auto count = input.gcount();
+        if (count <= 0) break;
+        output.write(buffer.data(), count);
+        if (!output) {
+            return {false, 1, "Write error while creating output.", copied};
+        }
+        copied += static_cast<std::uintmax_t>(count);
+    }
+
+    output.flush();
+    if (!output) {
+        return {false, 1, "Failed to finalize output file.", copied};
+    }
+
+    return {true, 0, "Native stream copy completed successfully.", copied};
 }
 
 } // namespace mflow
