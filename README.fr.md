@@ -13,23 +13,19 @@ Le projet vise à construire un moteur multimédia indépendant, sans dépendre 
 - 🇪🇸 [Español](README.es.md)
 - 🇩🇪 [Deutsch](README.de.md)
 
-## 🚀 v0.3.0
+## 🚀 v0.4.0
 
-MFlow 0.3.0 pose les premières bases du moteur multimédia natif.
+MFlow 0.4.0 introduit le premier modèle média natif réutilisable : packets, streams, timestamps, files de packets et contexte média. Aucun exécutable multimédia externe n'est utilisé.
 
-**MFlow ne nécessite pas FFmpeg ni d'exécutable multimédia externe.** Le chemin média actuel est directement intégré au projet.
+### What works
+
+La base native des packets, streams et timestamps est maintenant disponible. Le décodage/encodage des codecs ainsi que les demuxers/muxers complets seront implémentés progressivement.
+
 
 ### Ce qui fonctionne
 
-- Détection de la plateforme et de l'architecture
-- Analyse légère des fichiers média
-- Détection des familles MP4, Matroska/WebM, WAV, MP3 et Ogg
-- Pipeline d'exécution natif
-- Scheduler parallèle
-- Gestion des buffers
-- Copie native de fichiers/flux
-- CLI Windows et Linux
-- Tests et benchmarks
+La base native des packets, streams et timestamps est maintenant disponible. Le décodage/encodage des codecs ainsi que les demuxers/muxers complets seront implémentés progressivement.
+
 
 ### Ce qui n'est pas encore implémenté
 
@@ -266,4 +262,4 @@ MFlow est distribué sous licence MIT.
 
 ---
 
-**MFlow v0.3.0** — Fondations du moteur multimédia natif.
+**MFlow v0.4.0** — Native packet and stream engine.
