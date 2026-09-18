@@ -4,11 +4,14 @@
 
 MFlow es un motor multimedia nativo, local y de código abierto escrito en C++20.
 
-## 🚀 v0.3.0
+## 🚀 v0.4.0
 
-MFlow 0.3.0 establece las primeras bases del motor multimedia nativo.
+MFlow 0.4.0 introduce el primer modelo multimedia nativo reutilizable: paquetes, streams, timestamps, colas de paquetes y contexto multimedia. No se utiliza ningún ejecutable multimedia externo.
 
-El camino multimedia actual está integrado directamente en MFlow y no depende de un ejecutable multimedia externo.
+### What works
+
+La base nativa de paquetes, streams y timestamps ya está disponible. La decodificación/codificación de codecs y los demuxers/muxers completos se implementarán progresivamente.
+
 
 ### Funciona actualmente
 
