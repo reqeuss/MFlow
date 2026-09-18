@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.4.0 — 2026-09-18
+
+### Native packet and stream engine
+
+MFlow 0.4.0 introduces the first reusable native media data model. This release establishes packets, streams, timestamps, queues and a media context without relying on an external multimedia backend.
+
+### Added
+
+- Native Packet model with stream ID, PTS, DTS, duration and flags
+- Native Timestamp model with rational timebases and second conversion
+- Native Stream model for video, audio and data streams
+- Native PacketQueue with thread-safe push, pop, peek, clear and size operations
+- Native MediaContext for containers, streams, duration and packet ownership
+- Pipeline now uses the shared native packet model
+- Unit coverage for packet, stream, timestamp, queue and context behavior
+- C++20 build integration for the new stream implementation
+
+### Independence
+
+The new media model is implemented entirely inside MFlow. It does not invoke FFmpeg or another external multimedia executable.
+
+### Scope
+
+This release does not claim native codec decoding, encoding, demuxing or muxing yet. The new abstractions are the foundation required to implement those systems incrementally.
+
+### Next
+
+- Timestamp normalization and ordering
+- Native MP4 box parser
+- MP4 demuxer
+- MP4 muxer
+- Raw frame and audio sample abstractions
+- Native codec foundations
+
 ## 0.3.0 — 2026-09-17
 
 ### Native media foundation
