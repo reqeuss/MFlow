@@ -1,3 +1,5 @@
+[🇬🇧 English](README.md) · [🇫🇷 Français](README.fr.md) · [🇪🇸 Español](README.es.md) · [🇩🇪 Deutsch](README.de.md)
+
 # MFlow
 
 > **Move less data. Do less work. Measure everything.**
