@@ -1,5 +1,41 @@
 # Changelog
 
+## 0.4.1 — 2026-09-18
+
+### User-local installation
+
+MFlow can now be installed for the current user without administrator privileges.
+
+### Added
+
+- Windows installer script at `scripts/install-windows.ps1`
+- Linux installer script at `scripts/install-linux.sh`
+- Windows installation under `%LOCALAPPDATA%\\MFlow\\bin`
+- Linux installation under `~/.local/bin`
+- Automatic Windows user PATH registration
+- Current PowerShell PATH update after Windows installation
+- CMake user-local installation support
+- Lightweight installation that builds only the MFlow CLI
+
+### Usage
+
+After installation, MFlow can be launched from any directory:
+
+```text
+mflow version
+mflow info
+mflow probe input.mp4
+mflow convert input.mp4 output.mp4
+```
+
+### Independence
+
+The installation system does not add or require FFmpeg or another external multimedia executable.
+
+### Scope
+
+This release changes the distribution and installation workflow. It does not add native codec decoding/encoding or native MP4 demuxing/muxing.
+
 ## 0.4.0 — 2026-09-18
 
 ### Native packet and stream engine
