@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(MFlow VERSION 0.4.0 DESCRIPTION "Independent native multimedia processing engine" LANGUAGES CXX)
+project(MFlow VERSION 0.4.1 DESCRIPTION "Independent native multimedia processing engine" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -49,4 +49,7 @@ if(MFLOW_BUILD_EXAMPLES)
     target_link_libraries(mflow_pipeline_example PRIVATE mflow_core)
 endif()
 
+# User-local installation is supported through CMAKE_INSTALL_PREFIX.
+# Windows example: %LOCALAPPDATA%\\MFlow
+# Linux example:   $HOME/.local
 install(TARGETS mflow RUNTIME DESTINATION bin)
