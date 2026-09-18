@@ -2,102 +2,103 @@
 
 > **Move less data. Do less work. Measure everything.**
 
-MFlow is an open-source, local and native multimedia engine written in C++20.
+**MFlow is an open-source native multimedia engine written in C++20.**
 
-The project aims to build an independent multimedia engine with its own architecture, without requiring FFmpeg or another external multimedia executable.
+MFlow is being built as an independent multimedia stack. The long-term goal is to handle media containers, packets, streams, timestamps, frames, codecs, filters, scheduling and muxing inside MFlow rather than delegating media work to an external multimedia executable.
 
-## 🌍 Languages
+> 🚧 **Status:** MFlow is under active development. **v0.4.1** focuses on user-local installation and distribution. Native demuxing, muxing and codec implementations are still in development.
 
-- 🇬🇧 **English — this README**
-- 🇫🇷 [Français](README.fr.md)
-- 🇪🇸 [Español](README.es.md)
-- 🇩🇪 [Deutsch](README.de.md)
+---
 
-## 🚀 v0.4.0
+## 🧭 Repository Hub
 
-MFlow 0.4.0 introduces the first reusable native media data model: packets, streams, timestamps, packet queues and media context. No external multimedia executable is used.
+This README is the **main entry point for the GitHub repository**.
 
-### What works
+| Section | Purpose |
+|---|---|
+| 🚀 [Getting Started](#-getting-started) | Install, build and run MFlow |
+| 🖥️ [CLI](#️-cli) | Available commands |
+| 🧠 [Architecture](#-architecture) | Understand how MFlow is designed |
+| 🧩 [Current Foundation](#-current-native-foundation) | See what exists today |
+| 🗺️ [Roadmap](#️-roadmap) | Follow future development |
+| 📦 [Releases](#-releases) | Version milestones |
+| 🧪 [Development](#-development) | Build and test the project |
+| 📖 [Documentation](#-documentation) | Technical documentation |
+| 🌍 [Languages](#-languages) | Translated READMEs |
+| 📜 [Changelog](CHANGELOG.md) | Detailed version history |
 
-MFlow's native packet, stream and timestamp foundation is now available. Codec decoding/encoding and full demux/mux support are still being implemented incrementally.
+### 📁 Repository map
 
+- **[core/](core/)** — native MFlow engine and public C++ interfaces
+- **[cli/](cli/)** — command-line interface
+- **[tests/](tests/)** — automated tests
+- **[benchmarks/](benchmarks/)** — performance benchmarks
+- **[examples/](examples/)** — example programs
+- **[docs/](docs/)** — technical documentation
+- **[scripts/](scripts/)** — installation and development scripts
+- **[.github/](.github/)** — CI and repository automation
 
-### What works
+---
 
-- Platform and architecture detection
-- Lightweight media file probing
-- Detection of MP4, Matroska/WebM, WAV, MP3 and Ogg families
-- Native execution pipeline
-- Parallel scheduler
-- Buffer management
-- Native file/stream copying
-- Windows and Linux CLI
-- Tests and benchmarks
+## 🚀 Getting Started
 
-### What is not implemented yet
+### Windows — install MFlow globally for your user
 
-Full codec conversion is not available yet. MFlow therefore does not claim native H.264, H.265, AV1, AAC, Opus, or similar encoding/decoding support in this release.
+No administrator account is required.
 
-Unsupported codec or scaling requests are explicitly rejected instead of being delegated to an external program.
+From the repository in PowerShell:
 
-## 🧠 Philosophy
-
-MFlow is built around one simple rule:
-
-> **Do not process what you do not need.**
-
-Over time, the planner will determine whether an operation actually requires:
-
-- decoding;
-- encoding;
-- format conversion;
-- direct stream copying;
-- additional memory allocation;
-- CPU/GPU transfers;
-- or none of these operations.
-
-Target architecture:
-
-```text
-INPUT
-  ↓
-STREAM PLANNER
-  ↓
-WORK GRAPH
-  ├── VIDEO → DECODE → FILTER → ENCODE ─┐
-  └── AUDIO → DECODE → PROCESS → ENCODE ┤
-                                          ↓
-                                         MUX
-                                          ↓
-                                       OUTPUT
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+.\scripts\install-windows.ps1
 ```
 
-## 📦 Project structure
+The installer builds MFlow and installs:
 
 ```text
-MFlow/
-├── core/
-│   ├── include/mflow/
-│   └── src/
-├── cli/
-├── tests/
-├── benchmarks/
-├── examples/
-├── docs/
-├── CMakeLists.txt
-├── README.md
-├── README.fr.md
-├── README.es.md
-├── README.de.md
-├── CHANGELOG.md
-└── LICENSE
+%LOCALAPPDATA%\MFlow\bin\mflow.exe
 ```
 
-## 🔨 Build
+It also adds the directory to the current user's PATH.
 
-### Windows
+Then open a new terminal if necessary:
 
-Requirements: CMake 3.20+, a C++20-compatible compiler and Git.
+```powershell
+mflow version
+mflow info
+```
+
+You can now run `mflow` from **any directory**.
+
+### Linux — install MFlow globally for your user
+
+```bash
+chmod +x scripts/install-linux.sh
+./scripts/install-linux.sh
+```
+
+The executable is installed under:
+
+```text
+~/.local/bin/mflow
+```
+
+If required:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Then:
+
+```bash
+mflow version
+mflow info
+```
+
+### Build manually
+
+Windows:
 
 ```powershell
 cmake -S . -B build
@@ -105,16 +106,7 @@ cmake --build build --config Release
 ctest --test-dir build -C Release --output-on-failure
 ```
 
-With Ninja, executables are normally placed directly in `build/`.
-
-```powershell
-.\build\mflow.exe version
-.\build\mflow.exe info
-```
-
-### Linux
-
-Requirements: CMake 3.20+, a C++20-compatible compiler and Git.
+Linux:
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -122,14 +114,11 @@ cmake --build build -j
 ctest --test-dir build --output-on-failure
 ```
 
-Then:
-
-```bash
-./build/mflow version
-./build/mflow info
-```
+---
 
 ## 🖥️ CLI
+
+After installation:
 
 ```text
 mflow version
@@ -140,133 +129,235 @@ mflow pipeline-demo
 mflow benchmark
 ```
 
-### System information
+The current `convert` operation provides MFlow's native stream-copy path. It does not yet perform general codec transcoding.
+
+---
+
+## 🧠 Architecture
+
+MFlow is **not intended to be a thin wrapper around FFmpeg or another multimedia executable**.
+
+The target architecture is:
 
 ```text
-mflow info
+INPUT
+  ↓
+DEMUX
+  ↓
+STREAM PLANNER
+  ↓
+WORK GRAPH
+  ├── VIDEO → DECODE → FILTER → ENCODE ─┐
+  └── AUDIO → DECODE → PROCESS → ENCODE ┤
+                                          ↓
+                                         MUX
+                                          ↓
+                                        OUTPUT
 ```
 
-Displays the platform, architecture, hardware thread count and native media engine status.
+The planner should eventually determine the minimum amount of work required.
 
-### Probe a file
+For a container-only change:
 
 ```text
-mflow probe input.mp4
+MP4
+ ↓
+H.264 packets
+ ↓
+Remux
+ ↓
+MP4
 ```
 
-MFlow currently inspects known container/file signatures without launching an external program.
+No decode or encode should be necessary when the streams are already compatible.
 
-### Native copy
+For a resize:
 
 ```text
-mflow convert input.mp4 backup.mp4
+DEMUX → DECODE → RESIZE → ENCODE → MUX
 ```
 
-In v0.3.0, this command uses MFlow's native copy path. It does not perform codec transcoding yet.
+The core principle is:
 
-To prevent overwriting an existing file:
+> **Move less data. Do less work. Measure everything.**
 
-```text
-mflow convert input.mp4 backup.mp4 --no-overwrite
-```
+---
 
-## ⚡ Performance
+## 🧩 Current Native Foundation
 
-MFlow focuses on reducing unnecessary work rather than simply increasing thread count.
+MFlow currently provides reusable native abstractions for:
 
-Future media benchmarks should document:
+- **Packet** — packet data, stream ID, PTS, DTS, duration and flags
+- **Stream** — video, audio and data stream metadata
+- **Timestamp** — rational timebases and time conversion
+- **PacketQueue** — thread-safe packet buffering
+- **MediaContext** — container, streams, duration and packet ownership
+- **Pipeline** — processing stages operating on MFlow packets
+- **Scheduler** — parallel task execution
+- **Memory** — reusable buffer infrastructure
+- **Media probing** — lightweight native file/container detection
 
-- MFlow version;
-- operating system;
-- CPU;
-- GPU;
-- RAM;
-- compiler;
-- input media;
-- output format;
-- processing parameters.
+### Not implemented yet
 
-No serious performance comparison should be published without reproducible measurements.
+MFlow does not currently claim full native support for:
 
-## 🧩 Native architecture
+- H.264 / H.265 / AV1 decoding or encoding
+- AAC / Opus decoding or encoding
+- Native MP4 demuxing/muxing
+- General audio/video transcoding
+- Video scaling
+- GPU codec pipelines
 
-Components are separated so the engine can evolve incrementally:
+Unsupported operations are explicitly rejected instead of silently falling back to an external multimedia executable.
 
-```text
-Media Probe
-    ↓
-Stream Model
-    ↓
-Planner
-    ↓
-Pipeline / Scheduler
-    ↓
-Decoder / Filter / Encoder
-    ↓
-Muxer
-```
-
-The next development steps are real `Packet`, `Stream` and `Frame` models, followed by native parsers, demuxers and muxers.
+---
 
 ## 🗺️ Roadmap
 
-### v0.3.x
+### v0.4.x — Media foundations
 
-- stability;
-- additional tests;
-- Packet model;
-- Stream model;
-- timestamps;
-- improved probing;
-- real media benchmarks.
+- [x] Packet model
+- [x] Stream model
+- [x] Timestamp model
+- [x] Packet queue
+- [x] Media context
+- [x] User-local installation
+- [ ] Timestamp normalization and ordering
+- [ ] Native MP4 box parser
+- [ ] Native MP4 demuxer
+- [ ] Native MP4 muxer
+- [ ] Raw video frame system
+- [ ] Audio sample system
 
-### v0.4.x
+### v0.5.x — Codec foundations
 
-- native MP4 parser;
-- MP4 demuxer/muxer;
-- metadata;
-- audio/video stream model.
+- Native codec interfaces
+- Pixel formats
+- Audio sample formats
+- Decoder/encoder abstractions
+- First constrained native codec implementations
 
-### v0.5.x
+### Future
 
-- frames;
-- pixel formats;
-- audio formats;
-- first native codec implementations.
+- H.264
+- H.265
+- AV1
+- AAC
+- Opus
+- MKV/WebM
+- Zero-copy processing
+- GPU pipelines
+- Hardware acceleration
+- Asynchronous I/O
+- Pipeline fusion
+- Advanced stream planning
 
-### Later
+Each milestone should add a real reusable engine capability.
 
-- H.264 / H.265 / AV1;
-- AAC / Opus;
-- MKV/WebM;
-- zero-copy;
-- GPU processing;
-- pipeline fusion;
-- asynchronous I/O;
-- hardware acceleration.
+---
 
-Intermediate versions (`v0.3.1`, `v0.3.2`, etc.) will progressively add these capabilities while keeping the foundation stable.
+## 📦 Releases
 
-## 🧪 Tests
+| Version | Focus |
+|---|---|
+| **v0.4.1** | User-local installation and global `mflow` command |
+| **v0.4.0** | Native packet and stream foundation |
+| **v0.3.0** | Native media engine foundation |
+| **v0.1.0** | Core scheduler, pipeline and foundation |
+
+See **[CHANGELOG.md](CHANGELOG.md)** for the detailed history.
+
+---
+
+## 🧪 Development
+
+### Requirements
+
+- CMake 3.20+
+- C++20-compatible compiler
+- Git
+- Windows or Linux
+
+### Tests
 
 ```bash
 ctest --test-dir build --output-on-failure
 ```
 
-The project is intended to remain buildable and testable on Windows and Linux.
+### Repository structure
 
-## 🤝 Contributing
-
-Contributions are welcome. For significant changes, prefer modular architecture, tests and reproducible benchmarks for performance-related work.
-
-## 🔐 Independence
-
-MFlow is designed to operate without an external multimedia executable. Features that are not implemented are explicitly rejected instead of silently falling back to an external dependency.
-
-## 📜 License
-
-MFlow is distributed under the MIT License.
+```text
+MFlow/
+├── .github/       CI and automation
+├── benchmarks/    Performance benchmarks
+├── cli/           Command-line interface
+├── core/          Native MFlow engine
+├── docs/          Technical documentation
+├── examples/      Examples
+├── scripts/       Install/development scripts
+├── tests/         Automated tests
+├── CMakeLists.txt
+├── CHANGELOG.md
+├── LICENSE
+└── README*.md
+```
 
 ---
 
-**MFlow v0.4.0** — Native packet and stream engine.
+## 📖 Documentation
+
+The README is the repository hub. Detailed technical material belongs in **[docs/](docs/)**.
+
+Recommended documentation areas:
+
+- Architecture
+- Media model
+- Containers
+- Codecs
+- Pipeline planner
+- Memory management
+- Scheduler
+- Hardware acceleration
+- Performance
+- Contributing
+
+---
+
+## 🌍 Languages
+
+- 🇬🇧 **English — this README**
+- 🇫🇷 [Français](README.fr.md)
+- 🇪🇸 [Español](README.es.md)
+- 🇩🇪 [Deutsch](README.de.md)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome.
+
+For engine changes, prefer:
+
+1. small modular changes;
+2. tests for new behavior;
+3. documented limitations;
+4. reproducible benchmarks for performance claims;
+5. no hidden external multimedia dependencies.
+
+---
+
+## 🔐 Independence
+
+MFlow is designed to become an independent multimedia stack.
+
+The project does not use FFmpeg as a hidden fallback for features that MFlow has not implemented. Unsupported native operations should fail explicitly until their own implementation is available.
+
+---
+
+## 📜 License
+
+MFlow is released under the **MIT License**.
+
+---
+
+**MFlow v0.4.1** · Native multimedia engine · C++20
