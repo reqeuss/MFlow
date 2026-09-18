@@ -4,11 +4,14 @@
 
 MFlow ist eine lokale, Open-Source-Multimedia-Engine in nativem C++20.
 
-## 🚀 v0.3.0
+## 🚀 v0.4.0
 
-MFlow 0.3.0 legt die ersten Grundlagen der nativen Media-Engine.
+MFlow 0.4.0 führt das erste wiederverwendbare native Medienmodell ein: Pakete, Streams, Zeitstempel, Paketwarteschlangen und Media Context. Es wird kein externes Multimedia-Programm verwendet.
 
-Der aktuelle Medienpfad ist direkt in MFlow implementiert und benötigt kein externes Multimedia-Programm.
+### What works
+
+Die native Grundlage für Pakete, Streams und Zeitstempel ist jetzt vorhanden. Codec-Decodierung/-Codierung sowie vollständige Demuxer/Muxer werden schrittweise implementiert.
+
 
 ### Aktuell verfügbar
 
