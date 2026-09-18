@@ -1,5 +1,7 @@
 # Changelog
 
+All notable MFlow releases are documented here.
+
 ## 0.4.1 — 2026-09-18
 
 ### User-local installation
@@ -61,15 +63,6 @@ The new media model is implemented entirely inside MFlow. It does not invoke FFm
 
 This release does not claim native codec decoding, encoding, demuxing or muxing yet. The new abstractions are the foundation required to implement those systems incrementally.
 
-### Next
-
-- Timestamp normalization and ordering
-- Native MP4 box parser
-- MP4 demuxer
-- MP4 muxer
-- Raw frame and audio sample abstractions
-- Native codec foundations
-
 ## 0.3.0 — 2026-09-17
 
 ### Native media foundation
@@ -90,15 +83,43 @@ MFlow 0.3.0 removes the external media-backend execution path and establishes a 
 
 MFlow does not invoke or require an external multimedia executable for the v0.3 native path.
 
-This release deliberately does not claim native codec transcoding yet. Codec, demuxer and muxer implementations will be introduced incrementally in later releases.
+This release deliberately does not claim native codec transcoding yet.
 
-### Next
+## 0.2.0 — Historical
 
-- Packet and stream models
-- Native MP4 box parser
-- Native demux/mux interfaces
-- Timestamp and metadata handling
-- Raw frame/audio abstractions
-- Native codec implementations
-- Zero-copy buffer planning
-- Hardware acceleration abstractions
+### Development milestone
+
+v0.2.0 was an intermediate development milestone before MFlow moved to the fully native media-engine direction in v0.3.0.
+
+The historical v0.2.x work included early media conversion/CLI experimentation. Parts of that work relied on an external media backend and are therefore not part of the current MFlow architecture.
+
+### Important
+
+The current project direction is native-only: MFlow does not use FFmpeg or another external multimedia executable for media processing. Historical v0.2.x backend-dependent work should not be interpreted as the architecture of current or future releases.
+
+## 0.1.0 — 2026-09-16
+
+### Foundation release
+
+MFlow 0.1.0 established the initial C++20 engine foundation.
+
+### Added
+
+- Cross-platform CMake project structure
+- Core scheduler and worker execution foundation
+- Pipeline and stage abstraction
+- Memory/buffer foundation
+- System and platform information
+- CLI foundation
+- Benchmark executable
+- Example pipeline
+- Initial automated tests
+- Windows/Linux-oriented build foundation
+
+### Initial architecture
+
+The first release focused on creating a small, modular and measurable engine core that could later support native media processing.
+
+### Scope
+
+v0.1.0 did not provide a complete native multimedia codec or container engine. It was the foundation for the later native media work.
