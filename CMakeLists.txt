@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-project(MFlow VERSION 0.3.0 DESCRIPTION "Independent native multimedia processing engine" LANGUAGES CXX)
+project(MFlow VERSION 0.4.0 DESCRIPTION "Independent native multimedia processing engine" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -12,6 +12,7 @@ option(MFLOW_BUILD_EXAMPLES "Build MFlow examples" ON)
 
 add_library(mflow_core
     core/src/media.cpp
+    core/src/stream.cpp
     core/src/memory.cpp
     core/src/pipeline.cpp
     core/src/scheduler.cpp
