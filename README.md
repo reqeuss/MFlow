@@ -13,11 +13,14 @@ The project aims to build an independent multimedia engine with its own architec
 - 🇪🇸 [Español](README.es.md)
 - 🇩🇪 [Deutsch](README.de.md)
 
-## 🚀 v0.3.0
+## 🚀 v0.4.0
 
-MFlow 0.3.0 establishes the first foundations of the native media engine.
+MFlow 0.4.0 introduces the first reusable native media data model: packets, streams, timestamps, packet queues and media context. No external multimedia executable is used.
 
-**MFlow does not require FFmpeg or any external multimedia executable.** The current media path is implemented directly inside the project.
+### What works
+
+MFlow's native packet, stream and timestamp foundation is now available. Codec decoding/encoding and full demux/mux support are still being implemented incrementally.
+
 
 ### What works
 
@@ -266,4 +269,4 @@ MFlow is distributed under the MIT License.
 
 ---
 
-**MFlow v0.3.0** — Native media engine foundation.
+**MFlow v0.4.0** — Native packet and stream engine.
